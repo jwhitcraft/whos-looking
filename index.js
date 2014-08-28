@@ -6,7 +6,7 @@ var _ = require('lodash'),
     sockets = [],
     people = {},
     express = require('express'),
-    app = express.createServer(express.logger()),
+    app = express(),
     io = socketio.listen(app);
 
 app.listen(port, function() {
