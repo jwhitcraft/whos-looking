@@ -1,0 +1,27 @@
+{
+  "name": "whos_watching_server",
+  "version": "0.0.1",
+  "description": "SugarCRM Who's Looking Server",
+  "dependencies": {
+    "express": "^4.4.5",
+    "ws": "0.4.x",
+    "socket.io": "~1.0",
+    "lodash": "^2.4.1"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jwhitcraft/whos-looking.git"
+  },
+  "author": "Jon Whitcraft",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwhitcraft/whos-looking/issues"
+  },
+  "homepage": "https://github.com/jwhitcraft/whos-looking"
+}
