@@ -2,16 +2,15 @@ var _ = require('lodash'),
     socketio = require('socket.io')(),
     person = require('./libs/person'),
     records = require('./libs/records')(),
+    http = require('http'),
+    app = require('express')(),
+    server = http.createServer(app),
     port = process.env.PORT || 5000
     sockets = [],
     people = {},
-    express = require('express'),
-    app = express(),
-    io = socketio.listen(app);
+    io = socketio.listen(server);
 
-app.listen(port, function() {
-  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
-});
+server.listen(port);
 
 io.on('connection', function(socket){
     console.log('connected');
