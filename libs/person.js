@@ -10,6 +10,8 @@ var Person = function (user, socket) {
     this.name = user.name;
     this.image = user.image;
     this.socket_id = socket.id;
+
+    this.current_record = undefined;
 };
 util.inherits(Person, EventEmitter);
 

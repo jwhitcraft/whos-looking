@@ -13,10 +13,10 @@ var _ = require('lodash'),
 server.listen(port);
 
 io.on('connection', function(socket){
-    console.log('connected');
+    socket.emit('connected');
     socket.on('disconnect', function() {
         // need to loop over everything to find the user and
-        console.log('disconnected');
+        console.log('disconnected', people[socket.id]);
         delete people[socket.id];
     });
 
@@ -24,23 +24,39 @@ io.on('connection', function(socket){
         console.log('register', user);
         people[socket.id] = new person(user, socket);
         sockets.push(socket);
+        socket.emit('registered');
     })
 
     socket.on('leave-page', function(args) {
-        var rec = records.getRecord(args.module, args.page);
-        console.log('leave-page: ' + args.module + ' -- ' + args.page);
+        var rec = records.getRecord(args.module, args.action, args.id);
+        console.log('leave-page: ' + rec.name);
         rec.removeLooker(people[socket.id]);
     });
 
     socket.on('watch-page', function(args) {
-        var rec = records.getRecord(args.module, args.page);
-        console.log('watch-page: ' + args.module + ' -- ' + args.page);
-        rec.addLooker(people[socket.id]);
+        var rec = records.getRecord(args.module, args.action, args.id);
+        var person = people[socket.id];
+        console.log('current_record: ' + person.current_record);
+
+        if(!_.isUndefined(person.current_record)) {
+            c_record = records.getRecordByName(person.current_record);
+            if(!_.isUndefined(c_record)) {
+                c_record.removeLooker(person);
+            }
+        }
+
+        rec.addLooker(person);
+        console.log('watch-page: ' + rec.name);
+
+        // send back the lookers for the current page
+        var looker_data ={ 'count' : rec.count(), 'people': rec.getLookers() };
+        console.log(looker_data);
+        socket.emit('lookers', looker_data);
     });
 
     socket.on('get-lookers', function(args) {
-        console.log('get-lookers: ' + args.module + ' -- ' + args.page);
-        var rec = records.getRecord(args.module, args.page);
+        var rec = records.getRecord(args.module, args.action, args.id);
+        console.log('get-lookers: ' + rec.name);
         socket.emit('lookers', { 'count' : rec.count(), 'people': rec.getLookers() });
     });
 });

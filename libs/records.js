@@ -10,14 +10,26 @@ var Records = function () {
 };
 util.inherits(Records, EventEmitter);
 
-Records.prototype.getRecord = function(module, page) {
-    var name = module + '---' + page;
+Records.prototype.getRecord = function(module, action, id) {
+    var name = module + '---' + action;
+
+    if (!_.isUndefined(id)) {
+        name += '---' + id;
+    }
 
     if (!_.has(this.records, name)) {
-        this.records[name] = new record();
+        this.records[name] = new record(name);
     }
 
     return this.records[name];
+}
+
+Records.prototype.getRecordByName = function(name) {
+    if (_.has(this.records, name)) {
+        return this.records[name];
+    }
+
+    return undefined;
 }
 
 module.exports = function () {
