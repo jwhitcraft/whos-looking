@@ -1,9 +1,12 @@
 ({
     tagName: 'span',
+    fieldTag: 'a',
 
     ioSocket: undefined,
 
     registered: false,
+
+    user_html: '',
 
     initialize: function(options)
     {
@@ -26,20 +29,17 @@
         });
 
         if(app.api.isAuthenticated()) {
-            this.on('init', function() {
-
-                this.ioSocket = io.connect('http://localhost:5000');
-                this.ioSocket.on('registered', _.bind(function() {
-                    console.log('fuck you');
-                    this.registered = true;
-                }, this));
-                this.ioSocket.on('lookers', _.bind(function(data) {
-                    console.log(data);
-                }, this));
-            }, this);
+            this.ioSocket = io.connect('http://localhost:5000');
+            this.ioSocket.on('registered', _.bind(function() {
+                this.registered = true;
+            }, this));
+            this.ioSocket.on('lookers', _.bind(function(data) {
+                this.user_html = App.template.getView('looking.users')({users: _.toArray(data.people)});
+                this.$el.find(this.fieldTag).data('content', this.user_html)
+                debugger;
+            }, this));
 
             app.on('app:view:change', function(name, attributes) {
-                debugger;
                 if (this.registered) {
                     console.log('test', name, attributes);
                     var args = {

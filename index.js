@@ -16,6 +16,15 @@ io.on('connection', function(socket){
     socket.emit('connected');
     socket.on('disconnect', function() {
         // need to loop over everything to find the user and
+        var person = people[socket.id];
+        console.log('current_record: ' + person.current_record);
+
+        if(!_.isUndefined(person.current_record)) {
+            c_record = records.getRecordByName(person.current_record);
+            if(!_.isUndefined(c_record)) {
+                c_record.removeLooker(person);
+            }
+        }
         console.log('disconnected', people[socket.id]);
         delete people[socket.id];
     });
