@@ -1,71 +1,101 @@
 var _ = require('lodash'),
     socketio = require('socket.io')(),
     person = require('./libs/person'),
-    records = require('./libs/records')(),
     http = require('http'),
     app = require('express')(),
     server = http.createServer(app),
     port = process.env.PORT || 5000
-    sockets = [],
     people = {},
     io = socketio.listen(server);
 
 server.listen(port);
 
+/**
+ * Generate Room Name based on what is passed in
+ */
+function generateRoomName(module, action, id) {
+    var name = module + '---' + action;
+
+    if (!_.isUndefined(id)) {
+        name += '---' + id;
+    }
+
+    return name;
+}
+
+/**
+ * Find Users in a given room
+ */
+function findClientsSocket(roomId, namespace) {
+    var res = {
+        'users': []
+    },
+    ns = io.of(namespace || '/');    // the default namespace is "/"
+    if (ns && ns.adapter.rooms[roomId]) {
+        _.forEach(_.keys(ns.adapter.rooms[roomId]), function(socket_id) {
+            // todo: make sure we only brodcast back unique users.
+            if(!_.isUndefined(people[socket_id])) {
+                res.users.push(people[socket_id]);
+            }
+        });
+    }
+    return res;
+}
+
+/**
+ * Broadcast a message to all sockets a given room
+ */
+function broadcastRoomCount(room)
+{
+    console.log('broadcastFor: ' + room);
+    io.sockets.in(room).emit('lookers', room, findClientsSocket(room));
+}
+
+/**
+ * Switch what page a socket is looking at
+ */
+function lookAtPage(socket, page)
+{
+    if (socket.room) {
+        socket.leave(socket.room);
+        broadcastRoomCount(socket.room)
+    }
+
+    socket.room = generateRoomName(page.module, page.action, page.id);
+    socket.join(socket.room);
+    broadcastRoomCount(socket.room)
+}
+
+/**
+ * Do the Server Stuff here
+ */
 io.on('connection', function(socket){
-    socket.emit('connected');
+    /**
+     * Clean up on Disconnect
+     */
     socket.on('disconnect', function() {
         // need to loop over everything to find the user and
         var person = people[socket.id];
-        console.log('current_record: ' + person.current_record);
-
-        if(!_.isUndefined(person.current_record)) {
-            c_record = records.getRecordByName(person.current_record);
-            if(!_.isUndefined(c_record)) {
-                c_record.removeLooker(person);
-            }
-        }
         console.log('disconnected', people[socket.id]);
         delete people[socket.id];
     });
 
-    socket.on('register', function(user) {
-        console.log('register', user);
-        people[socket.id] = new person(user, socket);
-        sockets.push(socket);
-        socket.emit('registered');
-    })
-
-    socket.on('leave-page', function(args) {
-        var rec = records.getRecord(args.module, args.action, args.id);
-        console.log('leave-page: ' + rec.name);
-        rec.removeLooker(people[socket.id]);
-    });
-
-    socket.on('watch-page', function(args) {
-        var rec = records.getRecord(args.module, args.action, args.id);
-        var person = people[socket.id];
-        console.log('current_record: ' + person.current_record);
-
-        if(!_.isUndefined(person.current_record)) {
-            c_record = records.getRecordByName(person.current_record);
-            if(!_.isUndefined(c_record)) {
-                c_record.removeLooker(person);
-            }
+    /**
+     * Register a new socket with the user info and the starting page
+     */
+    socket.on('register', function(user, page) {
+        if (_.isUndefined(people[socket.id])) {
+            console.log('register', user);
+            people[socket.id] = new person(user, socket);
         }
 
-        rec.addLooker(person);
-        console.log('watch-page: ' + rec.name);
-
-        // send back the lookers for the current page
-        var looker_data ={ 'count' : rec.count(), 'people': rec.getLookers() };
-        console.log(looker_data);
-        socket.emit('lookers', looker_data);
+        lookAtPage(socket, page);
     });
 
-    socket.on('get-lookers', function(args) {
-        var rec = records.getRecord(args.module, args.action, args.id);
-        console.log('get-lookers: ' + rec.name);
-        socket.emit('lookers', { 'count' : rec.count(), 'people': rec.getLookers() });
+    /**
+     * Change what page is being looked at for a socket
+     */
+    socket.on('look-at-page', function(page) {
+        lookAtPage(socket, page);
     });
 });
