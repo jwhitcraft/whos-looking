@@ -6,57 +6,55 @@
 
     registered: false,
 
-    user_html: '',
+    users: [],
+
+    count: 0,
 
     initialize: function(options)
     {
         this._super('initialize', [options]);
-
-        this.before('render', function() {
-            return app.api.isAuthenticated();
-        }, null, this);
-
-        this.on('render', function() {
-            this.$el.find('a').popover();
-            if(app.user.has('id')) {
-                var user = {
-                    id: app.user.get('id'),
-                    name: app.user.get('full_name'),
-                    image: app.user.get('picture')
-                };
-                this.ioSocket.emit('register', user);
-            }
-        });
-
         if(app.api.isAuthenticated()) {
             this.ioSocket = io.connect('http://localhost:5000');
             this.ioSocket.on('registered', _.bind(function() {
                 this.registered = true;
             }, this));
-            this.ioSocket.on('lookers', _.bind(function(data) {
-                this.user_html = App.template.getView('looking.users')({users: _.toArray(data.people)});
-                this.$el.find(this.fieldTag).data('content', this.user_html)
-                debugger;
+            this.ioSocket.on('lookers', _.bind(function(room, data) {
+                this.count = _.size(data.users);
+                this.users = data.users;
+                this.render();
             }, this));
 
             app.on('app:view:change', function(name, attributes) {
+                var page = {
+                    'module': attributes.module,
+                    'action': name,
+                    'id': attributes.modelId
+                }
                 if (this.registered) {
-                    console.log('test', name, attributes);
-                    var args = {
-                        'module': attributes.module,
-                        'action': name,
-                        'id': attributes.modelId
-                    }
+                    this.ioSocket.emit('look-at-page', page);
+                } else {
+                    var user = {
+                        id: app.user.get('id'),
+                        name: app.user.get('full_name'),
+                        image: app.user.get('picture')
+                    };
 
-                    this.ioSocket.emit('watch-page', args);
+                    this.ioSocket.emit('register', user, page);
                 }
             }, this);
+        } else {
+            // we are not rendered, so listen to before('render') and stop it
+            this.before('render', function() {
+                return false;
+            }, null, this);
         }
     },
 
     _dispose: function() {
         app.off('app:view:change', null, this);
-        this.ioSocket.disconnect();
-        this.ioSocket = undefined;
+        if(this.ioSocket) {
+            this.ioSocket.disconnect();
+            this.ioSocket = undefined;
+        }
     }
 })

@@ -27,15 +27,13 @@ function generateRoomName(module, action, id) {
  * Find Users in a given room
  */
 function findClientsSocket(roomId, namespace) {
-    var res = {
-        'users': []
-    },
-    ns = io.of(namespace || '/');    // the default namespace is "/"
+    var res = [],
+        ns = io.of(namespace || '/');    // the default namespace is "/"
     if (ns && ns.adapter.rooms[roomId]) {
         _.forEach(_.keys(ns.adapter.rooms[roomId]), function(socket_id) {
             // todo: make sure we only brodcast back unique users.
             if(!_.isUndefined(people[socket_id])) {
-                res.users.push(people[socket_id]);
+                res.push(people[socket_id]);
             }
         });
     }
@@ -78,6 +76,8 @@ io.on('connection', function(socket){
         var person = people[socket.id];
         console.log('disconnected', people[socket.id]);
         delete people[socket.id];
+        // leave the room
+        socket.leave(socket.room);
     });
 
     /**

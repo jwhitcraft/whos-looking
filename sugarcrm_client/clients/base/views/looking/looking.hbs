@@ -1,1 +1,10 @@
-<a class="btn btn-invisible" data-container="body" data-toggle="popover" data-trigger="hover" data-content="" data-html="true" data-placement="top" data-original-title="Who's Looking"><i class="icon-eye-open"></i> Who's Looking</a>
+<span id="whos-looking" style="letter-spacing: 0em;" class="dropdown dropup">
+  <a data-hover="dropdown" data-toggle="dropdown" role="button" class="btn btn-success" href="#">{{count}}</a>
+  <div class="dropdown-menu pull-right scroll">
+      <ul role="menu" aria-labelledby="dLabel">
+          {{#each users}}
+            <li><a href="" class="ellipsis_inline">{{name}}</a></li>
+          {{/each}}
+      </ul>
+  </div>
+</span>
