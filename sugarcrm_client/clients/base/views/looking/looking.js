@@ -2,6 +2,11 @@
     tagName: 'span',
     fieldTag: 'a',
 
+    /**
+     * Where is my server located at
+     */
+    ioServer: 'http://localhost:5000',
+
     ioSocket: undefined,
 
     registered: false,
@@ -14,7 +19,7 @@
     {
         this._super('initialize', [options]);
         if(app.api.isAuthenticated()) {
-            this.ioSocket = io.connect('http://localhost:5000');
+            this.ioSocket = io.connect(this.ioServer);
             this.ioSocket.on('registered', _.bind(function() {
                 this.registered = true;
             }, this));
