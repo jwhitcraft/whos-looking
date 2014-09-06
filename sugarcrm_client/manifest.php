@@ -58,6 +58,10 @@ $installdefs = array (
       'from' => '<basepath>/include/javascript/socket.io.js',
       'to' => 'custom/include/javascript/socket.io.js',
     ),
+    array (
+      'from' => '<basepath>/include/javascript/hover-dropdown.js',
+      'to' => 'custom/include/javascript/hover-dropdown.js',
+    ),
   ),
   'post_execute' => array(
     0 => '<basepath>/repairs/quickRepairAndRebuild.php',

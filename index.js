@@ -45,8 +45,9 @@ function findClientsSocket(roomId, namespace) {
  */
 function broadcastRoomCount(room)
 {
-    console.log('broadcastFor: ' + room);
-    io.sockets.in(room).emit('lookers', room, findClientsSocket(room));
+    clients = findClientsSocket(room)
+    console.log('broadcastFor: ' + room, clients);
+    io.sockets.in(room).emit('lookers', room, clients);
 }
 
 /**

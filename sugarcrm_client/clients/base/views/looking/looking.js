@@ -19,8 +19,8 @@
                 this.registered = true;
             }, this));
             this.ioSocket.on('lookers', _.bind(function(room, data) {
-                this.count = _.size(data.users);
-                this.users = data.users;
+                this.count = _.size(data);
+                this.users = data;
                 this.render();
             }, this));
 
