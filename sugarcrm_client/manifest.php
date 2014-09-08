@@ -5,7 +5,7 @@ $manifest = array (
   array (
     'regex_matches' =>
     array (
-      '7\\.[2-9]\\.\\d*',
+      '7\\.[5-9]\\.\\d*',
       '7\\.\\d\\d\\.\\d*',
       '[8-9]\\.(.*?)',
     ),
@@ -24,7 +24,7 @@ $manifest = array (
   'icon' => '',
   'is_uninstallable' => true,
   'name' => 'Who is Looking',
-  'published_date' => '2014-04-02 19:59:10',
+  'published_date' => '{{pubdate}}',
   'type' => 'module',
   'version' => '1.0',
   'remove_tables' => '',

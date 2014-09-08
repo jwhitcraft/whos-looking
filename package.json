@@ -1,7 +1,7 @@
 {
-  "name": "whos_watching_server",
+  "name": "WhosLooking",
   "version": "0.10.0",
-  "description": "SugarCRM Who's Looking Server",
+  "description": "Who's Looking for SugarCRM",
   "dependencies": {
     "express": "~3.4.x",
     "ws": "0.4.x",
@@ -12,7 +12,9 @@
     "node": "0.10.x"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "package": "grunt package",
+    "cleanup": "grunt cleanup"
   },
   "repository": {
     "type": "git",
@@ -25,7 +27,10 @@
   },
   "homepage": "https://github.com/jwhitcraft/whos-looking",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-compress": "^0.11.0"
+    "grunt": "~0.4.5",
+    "grunt-cli": "~0.1.13",
+    "grunt-contrib-compress": "^0.11.0",
+    "grunt-shell": "^1.1.1",
+    "grunt-string-replace": "^0.2.7"
   }
 }
