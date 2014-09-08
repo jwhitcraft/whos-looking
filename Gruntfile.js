@@ -19,8 +19,8 @@ module.exports = function(grunt) {
             make_package : {
                 command: [
                     'mkdir _package',
-                    'cp -r ./sugarcrm_client/* _package',
-                    'ls ./sugarcrm_client/'
+                    'cp -r sugarcrm_client/* _package',
+                    'cp node_modules/socket.io-client/socket.io.js _package/include/javascript/socket.io.js'
                 ].join('&&')
             },
             cleanup_pkg: {

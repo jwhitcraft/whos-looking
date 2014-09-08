@@ -5,7 +5,8 @@
   "dependencies": {
     "express": "~3.4.x",
     "ws": "0.4.x",
-    "socket.io": "~1.0",
+    "socket.io": "~1.1",
+    "socket.io-client": "~1.1",
     "lodash": "^2.4.1"
   },
   "engines": {
