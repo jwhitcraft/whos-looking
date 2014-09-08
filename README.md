@@ -50,13 +50,6 @@ After the install has completed, you can run the follow command to generate the 
 grunt package --server=<your server here>
 ```
 
-## Errors
-If grunt gives you an error about the `_package` dir already exiting, just run the following command
-
-```shell
-grunt cleanup
-```
-
 # Installing Into SugarCRM
 All you need to do is use the module loader and load up the zip file and install it, after it has been installed just refresh your browser and if it can connect you'll see a count, in the footer of the application.
 

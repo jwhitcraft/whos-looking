@@ -1,31 +1,38 @@
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-string-replace');
 
     var ioServer = grunt.option('server');
-    ioServer = ioServer || 'http://locahost:5000'
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        config: {
-            server: ioServer
+        clean: {
+            package: ["_package"],
+            zip: ['<%= pkg.name %>*.zip']
         },
-        shell: {
-            cleanup : {
-                command: 'rm -rf <%= pkg.name %>*.zip'
-            },
-            make_package : {
-                command: [
-                    'mkdir _package',
-                    'cp -r sugarcrm_client/* _package',
-                    'cp node_modules/socket.io-client/socket.io.js _package/include/javascript/socket.io.js'
-                ].join('&&')
-            },
-            cleanup_pkg: {
-                command: 'rm -rf _package'
-            },
+        config: {
+            server: ioServer || 'http://locahost:5000'
+        },
+        copy: {
+            package: {
+                files: [
+                    // includes files within path and its sub-directories
+                    {
+                        expand: true,
+                        cwd: 'sugarcrm_client',
+                        src: ['**'],
+                        dest: '_package/'
+                    },
+                    {
+                        expane: true,
+                        src: ['node_modules/socket.io-client/socket.io.js'],
+                        dest: '_package/include/javascript/socket.io.js'
+                    }
+                ]
+            }
         },
         'string-replace': {
             server: {
@@ -61,12 +68,11 @@ module.exports = function(grunt) {
               archive: '<%= pkg.name %>-<%= grunt.template.today("mmddyyyy") %>.zip'
             },
             files: [
-              {expand: true, cwd: '_package/', src: ['**'], dest: '../'}, // includes files in path and its subdirs
+              {expand: true, cwd: '_package/', src: ['**'], dest: '../'}
             ]
           }
         }
     });
 
-    grunt.registerTask('package', ['shell:cleanup', 'shell:make_package', 'string-replace', 'compress:main', 'shell:cleanup_pkg']);
-    grunt.registerTask('cleanup', ['shell:cleanup', 'shell:cleanup_pkg'])
+    grunt.registerTask('package', ['clean', 'copy', 'string-replace', 'compress:main', 'clean:package']);
 };
